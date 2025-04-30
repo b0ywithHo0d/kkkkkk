@@ -1,28 +1,22 @@
+export OPENAI_API_KEY="your_api_key_here"
 import streamlit as st
 import openai
+import os
 
 st.title("GPT-4.1-mini 챗봇 웹앱")
 
-# API 키 입력란으로 세션 상태에 저장
-if "api_key" not in st.session_state:
-    st.session_state.api_key = ""
-
-api_key_input = st.text_input("OpenAI API Key를 입력하세요:", type="password", value=st.session_state.api_key)
-
-# 업데이트 세션 상태
-if api_key_input != st.session_state.api_key:
-    st.session_state.api_key = api_key_input
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    st.error("서버 환경변수에 OPENAI_API_KEY가 설정되어 있지 않습니다.")
 
 question = st.text_input("질문을 입력하세요:")
 
 if st.button("질문하기"):
-    if not st.session_state.api_key:
-        st.warning("API Key를 입력해주세요.")
-    elif not question:
+    if not question:
         st.warning("질문을 입력해주세요.")
     else:
         try:
-            openai.api_key = st.session_state.api_key
+            openai.api_key = api_key
             response = openai.ChatCompletion.create(
                 model="gpt-4.1-mini",
                 messages=[{"role": "user", "content": question}]
